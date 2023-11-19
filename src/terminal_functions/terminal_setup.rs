@@ -38,7 +38,6 @@ pub fn terminal_setup() -> Result<(), TerminalInitialSetupError> {
     };
 
     // clear the terminal
-
     match io::stdout().execute(Clear(crossterm::terminal::ClearType::All)) {
         Ok(_) => {}
         Err(err) => return Err(TerminalInitialSetupError::Unknown(err.to_string())),

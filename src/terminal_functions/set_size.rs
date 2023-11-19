@@ -37,6 +37,7 @@ pub fn set_size() -> Result<(), TerminalSizeError> {
             Ok(s) => TSize { x: s.0, y: s.1 },
             Err(err) => return Err(TerminalSizeError::Unknown(err.to_string())),
         };
+        
         // check if size has changed
         if last_size == size {
             // no change, keep looping
