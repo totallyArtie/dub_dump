@@ -38,27 +38,40 @@ pub fn copy_audio(master: String) -> String {
         std::string::ToString::to_string,
     );
 
-    // new folder name
-    let new: String = format!("{up_path}\\Dub_dump\\");
+    let new_path_str = format!("{up_path}\\Dub_dump\\");
+    let new_path = Path::new(&new_path_str);
 
-    match create_dir(&new) {
-        Ok(()) => {}
-        Err(err) => graceful_shutdown(
-            format!("[copy_audio] : error creating new folder: {err:#?}").as_str(),
-            1,
-        ),
+    debug_log!("{}", format!("target directory at:{}",new_path_str.as_str()));
+
+    // If the path isn't a directory then, then create a new folder
+    if !new_path.is_dir(){
+        debug_log!("attempting to create target directory");
+        match create_dir(new_path) {
+            Ok(()) => {}
+            Err(err) => graceful_shutdown(
+                format!("[copy_audio] : error creating new folder: {err:#?}").as_str(),
+                1,
+            ),
+        }
+        debug_log!("directory created")
+    } else {
+        debug_log!("target directory already exists");
     }
+
+
+
     let mut options: CopyOptions = CopyOptions::new(); //Initialize default values for CopyOptions
-    options = options.content_only(true);
+    options.content_only = true;
+    options.overwrite = true;
 
     // copy the directory
-    match copy(master, &new, &options) {
+    match copy(master, &new_path, &options) {
         Ok(_) => {}
         Err(err) => graceful_shutdown(
             format!("[copy_audio] : error copying files to new folder: {err:#?}").as_str(),
             1,
         ),
     }
-    // copy done! return the new dir
-    new
+
+    return new_path_str;
 }
